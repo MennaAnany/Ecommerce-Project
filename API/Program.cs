@@ -1,6 +1,7 @@
 using API.Data;
 using API.Entities;
 using API.Extensions;
+using API.Middlewares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
