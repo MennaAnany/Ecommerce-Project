@@ -1,5 +1,6 @@
 ﻿using API.Data;
 using API.Entities;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -11,46 +12,36 @@ namespace API.Extensions
     {
         public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
         {
-
             services.AddIdentityCore<AppUser>(opt =>
             {
                 opt.Password.RequireNonAlphanumeric = false;
                 opt.User.RequireUniqueEmail = true;
             })
-            .AddRoles<AppRole>()
-            .AddRoleManager<RoleManager<AppRole>>()
-            .AddSignInManager<SignInManager<AppUser>>()
-            .AddEntityFrameworkStores<DataContext>();
+                    .AddRoles<AppRole>()
+                    .AddRoleManager<RoleManager<AppRole>>()
+                    .AddSignInManager<SignInManager<AppUser>>()
+                    .AddEntityFrameworkStores<DataContext>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-           .AddJwtBearer(options =>
-           {
-               options.TokenValidationParameters = new TokenValidationParameters
-               {
-                   ValidateIssuerSigningKey = true,
-                   IssuerSigningKey =
-                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"])),
-                   ValidateIssuer = false,
-                   ValidateAudience = false
-               };
 
-               options.Events = new JwtBearerEvents
-               {
-                   OnMessageReceived = context =>
-                   {
-                       var accessToken = context.Request.Query["access_token"];
-
-                       var path = context.HttpContext.Request.Path;
-
-                       //if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
-                       //{
-                       //    context.Token = accessToken;
-                       //}
-
-                       return Task.CompletedTask;
-                   }
-               };
-           });
+                    .AddJwtBearer(options =>
+                    {
+                        // JWT configuration
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"])),
+                            ValidateIssuer = false,
+                            ValidateAudience = false
+                        };
+                    })
+                    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                    {
+                        // Cookie options configuration
+                        options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+                        options.Cookie.SameSite = SameSiteMode.None;
+                        options.Cookie.HttpOnly = true;
+                    });
 
             return services;
         }

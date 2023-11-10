@@ -12,5 +12,7 @@ namespace API.Entities
         public int Quantity { get; set; }
         public string Color { get; set; }
         public string Size { get; set; }
+        public Cart cart { get; set; }
+        public int CartId { get; set; }
     }
 }
