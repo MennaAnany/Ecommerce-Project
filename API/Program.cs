@@ -50,6 +50,8 @@ try
    var context = services.GetRequiredService<DataContext>();
    var userManager = services.GetRequiredService<UserManager<AppUser>>();
    var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
+   await Seed.SeedRoles(roleManager);
+   await Seed.AddAdminUser(userManager, roleManager);
    await context.Database.MigrateAsync();
 
 }

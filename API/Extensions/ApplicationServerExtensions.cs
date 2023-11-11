@@ -14,6 +14,7 @@ public static class ApplicationServerExtensions
         });
 
         services.AddScoped<ITokenService, TokenServices>();
+        services.AddCors();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
