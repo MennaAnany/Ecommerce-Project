@@ -30,12 +30,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-//// configure http request
-app.UseCors(builder => builder    
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-    .AllowCredentials()
-    .WithOrigins("http://localhost:4200"));
+
+app.UseCookiePolicy();
+
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -50,10 +47,8 @@ try
    var context = services.GetRequiredService<DataContext>();
    var userManager = services.GetRequiredService<UserManager<AppUser>>();
    var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
-   await Seed.SeedRoles(roleManager);
-   await Seed.AddAdminUser(userManager, roleManager);
+   await Seed.InitializeData(userManager, roleManager, context);
    await context.Database.MigrateAsync();
-
 }
 catch (Exception ex)
 {

@@ -9,15 +9,16 @@ namespace API.Data
 {
     public class Seed
     {
-        public static async Task InitializeData(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
+        public static async Task InitializeData(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, DataContext context)
         {
             await SeedRoles(roleManager);
             await AddAdminUser(userManager, roleManager);
+            await SeedCategories(context);
         }
 
         public static async Task AddAdminUser(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
         {
-            var adminEmail = "admin@admin.com";
+            var adminEmail = "admin@example.com";
             if (await userManager.FindByEmailAsync(adminEmail) == null)
             {
                 var adminUser = new AppUser { Email = adminEmail, UserName = "admin" };
@@ -34,6 +35,21 @@ namespace API.Data
             }
         }
 
+        public static async Task SeedCategories(DataContext context)
+        {
+            if (await context.Categories.AnyAsync()) return;
+
+            var Categories = new List<Category> {
+                new Category { Name = "Clothing" },
+                new Category { Name = "Shoes" },   
+                new Category { Name = "Electronics" },
+                new Category { Name = "Pet Supplies" }
+            };
+
+            await context.Categories.AddRangeAsync(Categories);
+            await context.SaveChangesAsync();
+        }
+
         public static async Task SeedRoles(RoleManager<AppRole> roleManager)
         {
             if (await roleManager.Roles.AnyAsync())
@@ -43,8 +59,8 @@ namespace API.Data
 
             var roles = new List<AppRole>
             {
-                new AppRole { Name = "User" },
-                new AppRole { Name = "Admin" }
+                new AppRole { Name = "Admin" },
+                new AppRole { Name = "User" }
             };
 
             foreach (var role in roles)

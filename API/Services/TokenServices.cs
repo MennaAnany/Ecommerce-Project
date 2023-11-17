@@ -30,7 +30,6 @@ namespace API.Services
 
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            ///////////////////////////////
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 
             var tokenDescriptor = new SecurityTokenDescriptor

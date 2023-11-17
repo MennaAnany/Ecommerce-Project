@@ -14,10 +14,12 @@ namespace API.Helpers
             CreateMap<Product, ProductDto>()
               .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.Name));
             CreateMap<CreateProductDto, Product>()
-            .ForMember(dest => dest.Slug, opt => opt.MapFrom(src => src.Name));
+            .ForMember(dest => dest.Slug, opt => opt.MapFrom(src => src.Name.Replace(" ", "-").ToLower()))
+            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => new Category { Name = src.Category }));
             CreateMap<UpdateProductDto, Product>();
             CreateMap<Cart, CartDto>();
             CreateMap<CartItem, CartItemDto>();
         }
     }
 }
+

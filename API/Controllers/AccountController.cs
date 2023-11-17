@@ -9,12 +9,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
+using System.Security.Claims;
+using Newtonsoft.Json.Linq;
 
 namespace API.Controllers
 {
-
-
     public class AccountController : BaseApiController
     {
         private readonly UserManager<AppUser> _userManager;
@@ -43,19 +42,25 @@ namespace API.Controllers
 
             if (!result.Succeeded) return BadRequest(result.Errors);
 
-
-
             var roleResult = await _userManager.AddToRoleAsync(user, "User");
 
             if (!roleResult.Succeeded) return BadRequest(roleResult.Errors);
 
+            var token = await _tokenService.CreateToken(user);
+
+            // Sign in with cookie authentication
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) }, CookieAuthenticationDefaults.AuthenticationScheme)));
+
             return new UserDto
             {
                 Id = user.Id,
+                Token = token,
                 Username = user.UserName,
-                Token = await _tokenService.CreateToken(user),
                 Email = user.Email
             };
+
         }
 
         [HttpPost("login")]
@@ -69,10 +74,17 @@ namespace API.Controllers
 
             if (!result.Succeeded) return BadRequest("Incorrect email or password");
 
+            var token = await _tokenService.CreateToken(user);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) }, CookieAuthenticationDefaults.AuthenticationScheme)));
+
+
             return new UserDto
             {
                 Id = user.Id,
-                Token = await _tokenService.CreateToken(user),
+                Token = token,
                 Username = user.UserName,
                 Email = user.Email
             };
@@ -120,6 +132,7 @@ namespace API.Controllers
         [HttpPost("logout")]
         public async Task<ActionResult> Logout()
         {
+            // Clear the existing cookie
             await HttpContext.SignOutAsync(
              CookieAuthenticationDefaults.AuthenticationScheme);
 
