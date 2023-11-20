@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using Newtonsoft.Json.Linq;
 
 namespace API.Controllers
 {
@@ -18,15 +17,15 @@ namespace API.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly ITokenService _tokenService;
+     //   private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
 
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenService tokenService, IMapper mapper)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,/* ITokenService tokenService*/ IMapper mapper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _tokenService = tokenService;
+        //    _tokenService = tokenService;
             _mapper = mapper;
 
         }
@@ -46,7 +45,7 @@ namespace API.Controllers
 
             if (!roleResult.Succeeded) return BadRequest(roleResult.Errors);
 
-            var token = await _tokenService.CreateToken(user);
+           // var token = await _tokenService.CreateToken(user);
 
             // Sign in with cookie authentication
             await HttpContext.SignInAsync(
@@ -56,7 +55,7 @@ namespace API.Controllers
             return new UserDto
             {
                 Id = user.Id,
-                Token = token,
+             //   Token = token,
                 Username = user.UserName,
                 Email = user.Email
             };
@@ -74,17 +73,16 @@ namespace API.Controllers
 
             if (!result.Succeeded) return BadRequest("Incorrect email or password");
 
-            var token = await _tokenService.CreateToken(user);
+          //  var token = await _tokenService.CreateToken(user);
 
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) }, CookieAuthenticationDefaults.AuthenticationScheme)));
 
-
             return new UserDto
             {
                 Id = user.Id,
-                Token = token,
+              //  Token = token,
                 Username = user.UserName,
                 Email = user.Email
             };

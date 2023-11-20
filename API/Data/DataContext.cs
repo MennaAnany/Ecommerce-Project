@@ -47,6 +47,13 @@ namespace API.Data
                     v => JsonConvert.DeserializeObject<List<string>>(v))
                 .Metadata.SetValueComparer(listValueComparer);
 
+            builder.Entity<Product>()
+              .Property(e => e.Sizes)
+              .HasConversion(
+                  v => JsonConvert.SerializeObject(v),
+                  v => JsonConvert.DeserializeObject<List<string>>(v))
+              .Metadata.SetValueComparer(listValueComparer);
+
             builder.Entity<AppUser>()
                   .HasMany(u => u.UserRoles)
                   .WithOne(u => u.User)

@@ -1,9 +1,7 @@
 ﻿using API.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace API.Data
 {
@@ -18,7 +16,7 @@ namespace API.Data
 
         public static async Task AddAdminUser(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
         {
-            var adminEmail = "admin@example.com";
+            var adminEmail = "Admin@example.com";
             if (await userManager.FindByEmailAsync(adminEmail) == null)
             {
                 var adminUser = new AppUser { Email = adminEmail, UserName = "admin" };

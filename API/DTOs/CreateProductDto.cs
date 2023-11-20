@@ -16,6 +16,8 @@ namespace API.DTOs
         public List<string> Images { get; set; }
         [Required] 
         public List<string> Colors { get; set; }
+        [Required]
+        public List<string> Sizes { get; set; }
         [Required] 
         public string Category { get; set; }
     }

@@ -11,6 +11,7 @@ namespace API.Entities
         public string Description { get; set; }
         public List<string> Images { get; set; }
         public List<string> Colors { get; set; }
+        public List<string> Sizes { get; set; }
         public int Quantity { get; set; }
         public Category Category { get; set; }
         public int CategoryId { get; set; }
