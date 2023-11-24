@@ -1,7 +1,6 @@
 ﻿using API.DTOs;
 using API.Entities;
 using AutoMapper;
-using System.Text.RegularExpressions;
 
 namespace API.Helpers
 {
@@ -19,6 +18,8 @@ namespace API.Helpers
             CreateMap<UpdateProductDto, Product>();
             CreateMap<Cart, CartDto>();
             CreateMap<CartItem, CartItemDto>();
+            CreateMap<Product, CartProductDto>()
+            .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Images[0]));
         }
     }
 }

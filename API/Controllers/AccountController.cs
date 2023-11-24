@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using API.Data;
 
 namespace API.Controllers
 {
@@ -19,15 +20,17 @@ namespace API.Controllers
         private readonly SignInManager<AppUser> _signInManager;
      //   private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,/* ITokenService tokenService*/ IMapper mapper)
+
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,/* ITokenService tokenService*/ IMapper mapper, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-        //    _tokenService = tokenService;
+            //    _tokenService = tokenService;
             _mapper = mapper;
-
+            _unitOfWork = unitOfWork;
         }
 
         [HttpPost("register")]
@@ -43,22 +46,34 @@ namespace API.Controllers
 
             var roleResult = await _userManager.AddToRoleAsync(user, "User");
 
-            if (!roleResult.Succeeded) return BadRequest(roleResult.Errors);
+            if (!roleResult.Succeeded) { return BadRequest(roleResult.Errors); }
 
-           // var token = await _tokenService.CreateToken(user);
+            // var token = await _tokenService.CreateToken(user);
 
-            // Sign in with cookie authentication
-            await HttpContext.SignInAsync(
+            var cart = new Cart
+            {
+                AppUserId = user.Id
+            };
+
+            _unitOfWork.CartRepository.AddCart(cart);
+
+            if (await _unitOfWork.Complete())
+            {
+                // Sign in with cookie authentication
+                await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) }, CookieAuthenticationDefaults.AuthenticationScheme)));
 
             return new UserDto
             {
                 Id = user.Id,
-             //   Token = token,
+             // Token = token,
                 Username = user.UserName,
                 Email = user.Email
             };
+
+            }
+            return BadRequest("Can not create the user");
 
         }
 
