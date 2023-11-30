@@ -13,10 +13,9 @@ namespace API.Data
             _context = context;
         }
 
-        public IUserRepository UserRepository => new UserRepository(_context, _mapper);
         public IProductRepository ProductRepository => new ProductRepository(_context, _mapper);
         public ICartRepository CartRepository => new CartRepository(_context, _mapper);
-
+        public IOrdersRepository OrdersRepository => new OrdersRepository(_context);
         public async Task<bool> Complete()
         {
             return await _context.SaveChangesAsync() > 0;

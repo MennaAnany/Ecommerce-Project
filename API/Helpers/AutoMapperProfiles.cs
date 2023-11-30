@@ -1,5 +1,6 @@
 ﻿using API.DTOs;
 using API.Entities;
+using API.Entities.API.Entities;
 using AutoMapper;
 
 namespace API.Helpers
@@ -20,6 +21,9 @@ namespace API.Helpers
             CreateMap<CartItem, CartItemDto>();
             CreateMap<Product, CartProductDto>()
             .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Images[0]));
+            CreateMap<Order, OrderDto>();
+            CreateMap<OrderItems, OrderItemDto>()
+              .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product));
         }
     }
 }

@@ -13,10 +13,8 @@ namespace API.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly DataContext _context;
-        public CartController(IUnitOfWork unitOfWork, ICategoryRepository categoryRepository, IMapper mapper, DataContext context)
+        public CartController(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _context = context;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
@@ -109,8 +107,6 @@ namespace API.Controllers
             await _unitOfWork.Complete();
 
            return NoContent();
-
-
         }
     }
 }

@@ -2,9 +2,9 @@
 {
     public interface IUnitOfWork
     {
-        IUserRepository UserRepository { get; }
         IProductRepository ProductRepository { get; }
         ICartRepository CartRepository { get; }
+        IOrdersRepository OrdersRepository { get; }
         Task<bool> Complete();
         bool HasChanges();
     }
