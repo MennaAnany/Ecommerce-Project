@@ -12,5 +12,6 @@ namespace API.Interfaces
         Task<Product> GetProductByIdAsync(int id);
         Task<ProductDto> GetProductBySlugAsync(string slug);
         Task<PagedList<ProductDto>> GetProductsAsync(ProductParams productParams);
+        Task<StatisticsDto> FindMostBoughtProduct(List<Order> orders);
     }
 }

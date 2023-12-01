@@ -5,6 +5,7 @@ using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace API.Data
 {
@@ -62,7 +63,7 @@ namespace API.Data
 
                 case "low":
                     query = query.OrderBy(p => p.Price);
-                   break;
+                    break;
                 default:
                     query = query.OrderBy(p => p.Id);
                     break;
@@ -75,5 +76,27 @@ namespace API.Data
 
             return await PagedList<ProductDto>.CreateAsync(query, productParams.PageNumber, productParams.PageSize);
         }
-    }
+
+        public async Task<StatisticsDto> FindMostBoughtProduct(List<Order> orders)
+        {
+            var mostBoughtProduct = orders
+                .SelectMany(order => order.OrderItems)
+                .GroupBy(orderItem => orderItem.Product)
+                .OrderByDescending(group => group.Sum(item => item.Quantity))
+                .FirstOrDefault();
+
+            if (mostBoughtProduct != null)
+                return new StatisticsDto
+                {
+                    Id = mostBoughtProduct.Key.Id,
+                    Name = mostBoughtProduct.Key.Name,
+                    Slug = mostBoughtProduct.Key.Slug,
+                    Price = mostBoughtProduct.Key.Price,
+                    Quantity = mostBoughtProduct.Sum(item => item.Quantity)
+                };
+
+            return null;
+
+        }
+    } 
 }
