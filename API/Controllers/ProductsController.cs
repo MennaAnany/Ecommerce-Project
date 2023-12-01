@@ -23,8 +23,8 @@ namespace API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [HttpPost("add-product")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Product>> CreateProduct([FromBody] CreateProductDto createProductDto)
         {
             if (createProductDto.Quantity < 0 || createProductDto.Price < 0)
@@ -42,8 +42,8 @@ namespace API.Controllers
 
         }
 
-        [HttpDelete("{id}")]
-        //[Authorize(Roles = "Admin")]
+        [HttpDelete("delete-product{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteProduct(int id)
         {
             var product = await _unitOfWork.ProductRepository.GetProductByIdAsync(id);
@@ -57,7 +57,6 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
         public async Task<ActionResult<PagedList<ProductDto>>> GetProducts([FromQuery] ProductParams productsParams)
         {
             var products = await _unitOfWork.ProductRepository.GetProductsAsync(productsParams);
@@ -68,7 +67,6 @@ namespace API.Controllers
         }
 
         [HttpGet("{slug}")]
-        //[Authorize(Roles = "Admin")]
         public async Task<ActionResult<ProductDto>> GetProduct(string slug)
         {
             var product = await _unitOfWork.ProductRepository.GetProductBySlugAsync(slug);
@@ -76,8 +74,8 @@ namespace API.Controllers
             return product == null ? NotFound("Product not found") : product;
         }
 
-        [HttpPatch("{id}")]
-        //[Authorize(Roles = "Admin")]
+        [HttpPatch("update-product{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Product>> UpdateProduct(int id,UpdateProductDto updateProductDto)
         {
             var product = await _unitOfWork.ProductRepository.GetProductByIdAsync(id);

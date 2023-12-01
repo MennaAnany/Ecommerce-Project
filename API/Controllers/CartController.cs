@@ -66,7 +66,7 @@ namespace API.Controllers
         }
 
         [Authorize]
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-cart-item{id}")]
         public async Task<ActionResult> DeleteCartItem(int id)
         {
             var cart = await _unitOfWork.CartRepository.GetCartAsync(User.GetUserId());
@@ -88,25 +88,6 @@ namespace API.Controllers
                 return NoContent();
             }
             return BadRequest("Unable to delete this item");
-        }
-
-        [Authorize]
-        [HttpDelete]
-
-        public async Task<ActionResult> DeleteCart()
-        {
-            var userId = User.GetUserId();
-            var cart = await _unitOfWork.CartRepository.GetCartAsync(userId);
-
-            if (cart == null) return NotFound("Cart not found for this user");
-
-            cart.CartItems.Clear();
-            cart.SubTotal = 0;
-
-            _unitOfWork.CartRepository.UpdateCart(cart);
-            await _unitOfWork.Complete();
-
-           return NoContent();
         }
     }
 }

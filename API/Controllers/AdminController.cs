@@ -13,16 +13,14 @@ namespace API.Controllers
     public class AdminController : BaseApiController
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly DataContext _context;
 
 
-        public AdminController(DataContext context, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,/* ITokenService tokenService*/ IMapper mapper, IUnitOfWork unitOfWork)
+        public AdminController(DataContext context, UserManager<AppUser> userManager, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _context = context;
@@ -32,7 +30,6 @@ namespace API.Controllers
         [HttpGet("get-users")]
         public async Task<IEnumerable<UserDto>> GetUsers()
         {
-
             var users = await _context.Users.ToListAsync();
 
             var userDto = _mapper.Map<IEnumerable<UserDto>>(users);
@@ -47,8 +44,7 @@ namespace API.Controllers
         {
             var user = await _userManager.FindByIdAsync(id);
 
-            if (user == null)
-                return NotFound("User not found");
+            if (user == null) return NotFound("User not found");
 
             var userDto = new UserDto
             {
@@ -66,10 +62,7 @@ namespace API.Controllers
         {
             var user = await _userManager.FindByIdAsync(id);
 
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
+            if (user == null) return NotFound("User not found");
 
             var result = await _userManager.DeleteAsync(user);
 

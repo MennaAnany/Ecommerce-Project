@@ -29,10 +29,7 @@ namespace API.Controllers
             var userId = User.GetUserId();
             var orderDto = await _unitOfWork.OrdersRepository.CheckoutAsync(userId);
 
-            if (orderDto == null)
-            {
-                return NotFound("Cart is empty, Add items to your cart");
-            }
+            if (orderDto == null) return NotFound("Cart is empty, Add items to your cart");
 
             return Ok(orderDto);
         }
@@ -50,7 +47,7 @@ namespace API.Controllers
         }
 
         [Authorize]
-        [HttpDelete("delete/{orderId}")]
+        [HttpDelete("delete-order/{orderId}")]
         public async Task<ActionResult> DeleteOrder(int orderId)
         {
             var userId = User.GetUserId();
@@ -59,9 +56,7 @@ namespace API.Controllers
                 .FirstOrDefaultAsync(o => o.Id == orderId && o.AppUserId == userId);
 
             if (order == null)
-            {
                 return NotFound("Order not found for this user");
-            }
 
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
