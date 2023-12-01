@@ -18,17 +18,17 @@ namespace API.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-     //   private readonly ITokenService _tokenService;
+        private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
 
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,/* ITokenService tokenService*/ IMapper mapper, IUnitOfWork unitOfWork)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenService tokenService ,IMapper mapper, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            //    _tokenService = tokenService;
+            _tokenService = tokenService;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
@@ -48,8 +48,6 @@ namespace API.Controllers
 
             if (!roleResult.Succeeded) { return BadRequest(roleResult.Errors); }
 
-            // var token = await _tokenService.CreateToken(user);
-
             var cart = new Cart
             {
                 AppUserId = user.Id
@@ -61,13 +59,13 @@ namespace API.Controllers
             {
                 // Sign in with cookie authentication
                 await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) }, CookieAuthenticationDefaults.AuthenticationScheme)));
+                  CookieAuthenticationDefaults.AuthenticationScheme,
+                  new ClaimsPrincipal(await _tokenService.CreateToken(user)));
 
-            return new UserDto
+
+                return new UserDto
             {
                 Id = user.Id,
-             // Token = token,
                 Username = user.UserName,
                 Email = user.Email
             };
@@ -88,16 +86,14 @@ namespace API.Controllers
 
             if (!result.Succeeded) return BadRequest("Incorrect email or password");
 
-          //  var token = await _tokenService.CreateToken(user);
-
             await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) }, CookieAuthenticationDefaults.AuthenticationScheme)));
+                  CookieAuthenticationDefaults.AuthenticationScheme,
+                  new ClaimsPrincipal(await _tokenService.CreateToken(user)));
+
 
             return new UserDto
             {
                 Id = user.Id,
-              //  Token = token,
                 Username = user.UserName,
                 Email = user.Email
             };

@@ -1,9 +1,10 @@
 ﻿using API.Entities;
+using System.Security.Claims;
 
 namespace API.Interfaces
 {
     public interface ITokenService
     {
-        Task<string> CreateToken(AppUser user);
+        Task<ClaimsIdentity> CreateToken(AppUser user);
     }
 }
